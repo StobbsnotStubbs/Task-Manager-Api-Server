@@ -31,6 +31,10 @@ app.get("/", homeHandler);
 const error404 = require("./handlers/404");
 const error500 = require("./handlers/500");
 app.post("/taskmanager/add", addTaskHandler);
+app.get("/taskmanager/get-tasks", getTaskHandler);
+//app.delete("/taskmanager/delete-tasks/:id", deleteTaskHandler);
+//app.put("/taskmanager/updateTask/:id", updateTaskHandler);
+//app.get("/taskmanager/getUsersTasks", getUsersTasksHandler);
 
 // Routes Handlers
 function homeHandler(request, response) {
@@ -52,6 +56,11 @@ async function addTaskHandler(req, res) {
   } catch (error) {
     res.status(400).send("Task not created");
   }
+}
+
+async function getTaskHandler(req, res) {
+  let allTasks = await taskModel.find({});
+  res.status(200).send(allTasks);
 }
 
 const PORT = process.env.PORT;
