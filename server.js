@@ -32,9 +32,9 @@ const error404 = require("./handlers/404");
 const error500 = require("./handlers/500");
 app.post("/taskmanager/add", addTaskHandler);
 app.get("/taskmanager/get-tasks", getTaskHandler);
-//app.delete("/taskmanager/delete-tasks/:id", deleteTaskHandler);
-//app.put("/taskmanager/updateTask/:id", updateTaskHandler);
-//app.get("/taskmanager/getUsersTasks", getUsersTasksHandler);
+app.delete("/taskmanager/delete-tasks/:id", deleteTaskHandler);
+app.put("/taskmanager/updateTask/:id", updateTaskHandler);
+app.get("/taskmanager/getUsersTasks/:user", getUsersTasksHandler);
 
 // Routes Handlers
 function homeHandler(request, response) {
@@ -61,6 +61,31 @@ async function addTaskHandler(req, res) {
 async function getTaskHandler(req, res) {
   let allTasks = await taskModel.find({});
   res.status(200).send(allTasks);
+}
+
+async function deleteTaskHandler(req, res) {
+  const id = req.params.id;
+  await taskModel.findByIdAndDelete(id);
+  let allTasks = await taskModel.find({});
+  res.send(allTasks);
+}
+
+async function getUsersTasksHandler(req, res) {
+  let userId = req.params.user;
+  let userTasks = await taskModel.find({ user: userId });
+  res.send(userTasks);
+}
+
+async function updateTaskHandler(req, res) {
+  const { taskTitle, user, dueDate, priorityLevel, description } = req.body;
+  const id = req.params.id;
+  await taskModel.findByIdAndUpdate(
+    id,
+    { taskTitle, user, dueDate, priorityLevel, description },
+    { new: true, overwrite: true }
+  );
+  let allTasks = await taskModel.find({});
+  res.send(allTasks);
 }
 
 const PORT = process.env.PORT;
