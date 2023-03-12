@@ -9,15 +9,17 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const taskSchema = new mongoose.Schema({
-  taskTitle: String,
-  user: String,
-  dueDate: String,
-  priorityLevel: String,
-  description: String,
-  status: { type: String, default: "pending" },
-  timeStamp: { type: String, default: Date.now() },
-});
+const taskSchema = new mongoose.Schema(
+  {
+    taskTitle: String,
+    user: String,
+    dueDate: String,
+    priorityLevel: String,
+    description: String,
+    status: { type: String, default: "pending" },
+  }
+  //{ timestamps: true }
+);
 
 const taskModel = mongoose.model("task", taskSchema);
 
