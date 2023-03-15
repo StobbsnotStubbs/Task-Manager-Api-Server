@@ -21,7 +21,12 @@ const taskSchema = new mongoose.Schema(
   //{ timestamps: true }
 );
 
+const userSchema = new mongoose.Schema({
+  username: String,
+});
+
 const taskModel = mongoose.model("task", taskSchema);
+const userModel = mongoose.model("user", userSchema);
 
 mongoose
   .connect("mongodb://127.0.0.1:27017/taskmanager")
@@ -81,13 +86,27 @@ async function getUsersTasksHandler(req, res) {
 async function updateTaskHandler(req, res) {
   const { taskTitle, user, dueDate, priorityLevel, description } = req.body;
   const id = req.params.id;
-  await taskModel.findByIdAndUpdate(
-    id,
-    { taskTitle, user, dueDate, priorityLevel, description },
-    { new: true, overwrite: true }
-  );
+  await taskModel.findByIdAndUpdate(id, { taskTitle, user, dueDate, priorityLevel, description }, { new: true, overwrite: true });
   let allTasks = await taskModel.find({});
   res.send(allTasks);
+}
+
+// users
+app.post("/taskmanager/users/login", addLoginHandler);
+
+async function addLoginHandler(req, res) {
+  try {
+    const { username } = req.body;
+    const userExists = await userModel.findOne({ username });
+    if (userExists) {
+      return res.send("User already exists");
+    } else {
+      const newUser = await userModel.create({ username });
+      return res.send("User added successfully");
+    }
+  } catch (error) {
+    res.status(400).send("User not created");
+  }
 }
 
 const PORT = process.env.PORT;
